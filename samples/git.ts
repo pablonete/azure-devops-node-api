@@ -62,6 +62,21 @@ export async function run() {
         else {
             console.log("Must have an active pull request in repo with an active comment thread", firstRepo.name, "for this part of the sample");
         }
+
+        if (pullRequests.length > 0) {
+            common.heading("Get commits diff for an active pull request");
+            const baseVersionDescriptor: GitInterfaces.GitVersionDescriptor = {
+                version: pullRequests[0].lastMergeTargetCommit.commitId,
+                versionType: GitInterfaces.GitVersionType.Commit,
+            };
+            const targetVersionDescriptor: GitInterfaces.GitVersionDescriptor = {
+                version: pullRequests[0].lastMergeSourceCommit.commitId,
+                versionType: GitInterfaces.GitVersionType.Commit,
+            };
+            const diff = await gitApiObject.getCommitDiffs(firstRepo.id, project, true, 10, 0, baseVersionDescriptor, targetVersionDescriptor);
+            const firstPaths = diff.changes.slice(0, 5).map(change => change.item.path);
+            console.log("Diff changes loaded:", firstPaths);
+        }
     }
     else {
         console.log("Must have an active repository for this part of the sample");
